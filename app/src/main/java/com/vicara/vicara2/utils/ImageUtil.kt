@@ -3,20 +3,15 @@ package com.vicara.vicara2.utils
 import android.app.Application
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
-import android.provider.MediaStore
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.room.util.copy
 import com.vicara.vicara2.R
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
-import java.nio.file.StandardCopyOption
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -34,6 +29,14 @@ fun pathToBitmap(path: String, context: Context) : Bitmap{
     return imgBitmap
 }
 
+fun isFileExist(path: String) : Boolean {
+    val file = File(path)
+    if (file.exists()){
+        return true
+    }
+    return false
+}
+
 fun createFile(application: Application): File {
     val mediaDir = application.externalMediaDirs.firstOrNull()?.let {
         File(it, application.resources.getString(R.string.app_name)).apply { mkdirs() }
@@ -47,8 +50,11 @@ fun createFile(application: Application): File {
         FILENAME_FORMAT,
         Locale.US
     ).format(System.currentTimeMillis())
-
-    return File(outputDirectory, "$timeStamp.jpg")
+    val result = File(outputDirectory, "$timeStamp.jpg")
+    if (result.exists()){
+        result.delete()
+    }
+    return result
 }
 
 fun saveFile(application: Application, file: File){
@@ -66,7 +72,7 @@ fun saveFile(application: Application, file: File){
     ).format(System.currentTimeMillis())
 
     val result = File(outputDirectory, "$timeStamp.jpg")
-    file.copyTo(result)
+    file.copyTo(result, overwrite = true)
 }
 
 fun createTempFile(context: Context): File {

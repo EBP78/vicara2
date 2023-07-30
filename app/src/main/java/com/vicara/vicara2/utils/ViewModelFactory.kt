@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.vicara.vicara2.data.Repository
 import com.vicara.vicara2.ui.screen.addkartu.AddKartuViewModel
+import com.vicara.vicara2.ui.screen.edit.EditKartuViewModel
+import com.vicara.vicara2.ui.screen.home.HomeViewModel
 import com.vicara.vicara2.ui.screen.koleksikartu.KoleksiKartuViewModel
 import com.vicara.vicara2.ui.screen.susunkartu.SusunKartuViewModel
 
@@ -33,6 +35,12 @@ class ViewModelFactory private constructor(private val repository: Repository) :
             }
             modelClass.isAssignableFrom(SusunKartuViewModel::class.java) -> {
                 SusunKartuViewModel(repository) as T
+            }
+            modelClass.isAssignableFrom(HomeViewModel::class.java) -> {
+                HomeViewModel(repository) as T
+            }
+            modelClass.isAssignableFrom(EditKartuViewModel::class.java) -> {
+                EditKartuViewModel(repository) as T
             }
             else -> throw Throwable("Unknown ViewModel class: " + modelClass.name)
         }

@@ -3,8 +3,10 @@ package com.vicara.vicara2.ui.screen.addkartu
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.vicara.vicara2.data.Repository
 import com.vicara.vicara2.data.local.entity.CardItem
+import kotlinx.coroutines.launch
 
 class AddKartuViewModel (private val repository: Repository) : ViewModel() {
 
@@ -33,7 +35,6 @@ class AddKartuViewModel (private val repository: Repository) : ViewModel() {
         _query.value = newValue
     }
 
-    // todo : buat fungsi insert ke database
     fun insertData(cardItem: CardItem){
         // todo : cek jika kosong text / imagepath
         repository.insertCard(cardItem)

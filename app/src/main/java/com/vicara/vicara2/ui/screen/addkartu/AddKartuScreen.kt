@@ -35,7 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.vicara.vicara2.R
 import com.vicara.vicara2.data.local.entity.CardItem
 import com.vicara.vicara2.ui.component.ImageChooseItem
@@ -43,12 +44,11 @@ import com.vicara.vicara2.ui.component.InputText
 import com.vicara.vicara2.ui.component.Overlay
 import com.vicara.vicara2.utils.ViewModelFactory
 import com.vicara.vicara2.utils.createTempFile
-import com.vicara.vicara2.utils.pathToBitmap
+import com.vicara.vicara2.utils.isFileExist
 import com.vicara.vicara2.utils.saveFile
 import com.vicara.vicara2.utils.uriToFile
 import java.io.File
 
-// todo : screen ini bisa buat screen edit / copas aja ubah dikit
 @Composable
 fun AddKartuScreen (
     application: Application,
@@ -65,19 +65,41 @@ fun AddKartuScreen (
 
     Box(modifier = modifier.fillMaxSize()){
         Column (modifier = Modifier.align(Alignment.CenterStart).padding(start = 50.dp)) {
-            Image(
-                painter = rememberImagePainter(data = pathToBitmap(imagePath, context)),
-                contentDescription = "image",
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(150.dp)
-                    .height(150.dp)
-            )
+//            Image(
+//                painter = rememberImagePainter(data = pathToBitmap(imagePath, context)),
+//                contentDescription = "image",
+//                alignment = Alignment.Center,
+//                contentScale = ContentScale.Crop,
+//                modifier = Modifier
+//                    .width(150.dp)
+//                    .height(150.dp)
+//            )
+            if (isFileExist(imagePath)){
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(imagePath)
+                        .build(),
+                    contentDescription = "image",
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(150.dp)
+                )
+            } else {
+                Image(
+                    painterResource(id = R.drawable.gallery),
+                    contentDescription = "image",
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(150.dp)
+                        .height(150.dp)
+                )
+            }
             InputText(query = query, onQueryChange = {viewModel.updateQuery(it)}, placeholder = "kata - kata", modifier = Modifier.width(150.dp))
         }
         Column (modifier = Modifier.align(Alignment.CenterEnd).padding(end = 50.dp)) {
-            // TODO : ukuran msaih terlalu besar perbaiki dan image untuk tambah / enter
             Image(
                 painterResource(id = R.drawable.camera),
                 contentDescription = "image",
@@ -149,7 +171,7 @@ fun AskImage(
                 }
                 ImageChooseItem(
                     resDrawable = R.drawable.camera,
-                    text = "Gallery",
+                    text = "Camera",
                     onClick = {
                         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                         intent.resolveActivity(context.packageManager)
@@ -164,7 +186,9 @@ fun AskImage(
                             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                             cameraLauncher.launch(intent)
                         }
-                    }
+                        closeOverlay()
+                    },
+                    modifier = Modifier.width(150.dp)
                 )
                 // TODO : perbaiki lebar dari divider dan samakan lebar dari imagechoose
                 Divider(thickness = 1.dp, color = Color.Black, modifier = Modifier.width(150.dp))
@@ -177,7 +201,9 @@ fun AskImage(
                         intent.type = "image/*"
                         val chooser = Intent.createChooser(intent, "Choose a Picture")
                         galleryLauncher.launch(chooser)
-                    }
+                        closeOverlay()
+                    },
+                    modifier = Modifier.width(150.dp)
                 )
         } }, isVisible = show, onClickOutside = {closeOverlay()})
     }

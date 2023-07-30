@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.vicara.vicara2.data.local.entity.CardItem
 
 @Dao
@@ -16,8 +17,11 @@ interface CardItemDao {
     @Delete
     fun deleteCard(cardItem: CardItem)
 
+    @Update
+    fun updateCard(cardItem: CardItem)
+
     @Query("SELECT * FROM kartu WHERE id = :id")
-    fun getCardById(id: Int): CardItem
+    suspend fun getCardById(id: Int): CardItem
 
     @Query("SELECT * FROM kartu")
     suspend fun getAllCard(): List<CardItem>

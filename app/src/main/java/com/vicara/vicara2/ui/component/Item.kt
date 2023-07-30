@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,10 +23,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.vicara.vicara2.R
 import com.vicara.vicara2.ui.theme.Vicara2Theme
-import com.vicara.vicara2.utils.pathToBitmap
+import com.vicara.vicara2.utils.isFileExist
 
 @Composable
 fun Item(
@@ -45,7 +45,7 @@ fun Item(
         modifier = modifier
             .width(150.dp)
             .height(150.dp)
-            .clickable (interactionSource = interactionSource , indication = null) { onClick(text) },
+            .clickable(interactionSource = interactionSource, indication = null) { onClick(text) },
         elevation = 10.dp
     ) {
         Column (modifier = modifier){
@@ -60,15 +60,40 @@ fun Item(
                         .height(100.dp)
                 )
             } else {
-                Image(
-                    painter = rememberImagePainter(data = pathToBitmap(imagePath, context)),
-                    contentDescription = "image",
-                    alignment = Alignment.Center,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                )
+                // penggunaan pertama
+//                Image(
+//                    painter = rememberImagePainter(data = pathToBitmap(imagePath, context)),
+//                    contentDescription = "image",
+//                    alignment = Alignment.Center,
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(100.dp)
+//                )
+                // use asynimage to make the load lighter
+                if (isFileExist(imagePath)){
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(imagePath)
+                            .build(),
+                        contentDescription = "image",
+                        alignment = Alignment.Center,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                    )
+                } else {
+                    Image(
+                        painterResource(id = R.drawable.gallery),
+                        contentDescription = "image",
+                        alignment = Alignment.Center,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp)
+                    )
+                }
             }
             Text(
                 text = text,

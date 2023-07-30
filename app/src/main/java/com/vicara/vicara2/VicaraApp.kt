@@ -7,11 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.vicara.vicara2.ui.navigation.Screen
 import com.vicara.vicara2.ui.screen.addkartu.AddKartuScreen
+import com.vicara.vicara2.ui.screen.edit.EditKartuScreen
 import com.vicara.vicara2.ui.screen.home.HomeScreen
 import com.vicara.vicara2.ui.screen.koleksikartu.KoleksiKartuScreen
 import com.vicara.vicara2.ui.screen.susunkartu.SusunKartuScreen
@@ -46,14 +49,29 @@ fun VicaraApp(
             }
             composable(Screen.AddKartu.route){
                 AddKartuScreen(application, backToHome = {
-                    navController.navigate(Screen.Home.route)
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.id)
+                    }
                 })
             }
             composable(Screen.KoleksiKartu.route){
-                KoleksiKartuScreen()
+                KoleksiKartuScreen(editKartu = {
+                    navController.navigate(Screen.EditKartu.createRoute(it))
+                })
             }
             composable(Screen.SusunKartu.route){
                 SusunKartuScreen()
+            }
+            composable(
+                route = Screen.EditKartu.route,
+                arguments = listOf(navArgument("kartuId"){
+                    type = NavType.IntType
+                })
+            ) {
+                val kartuId = it.arguments?.getInt("kartuId") ?: 0
+                EditKartuScreen(id = kartuId, application = application, backToKoleksi = {
+                    navController.navigateUp()
+                })
             }
         }
 
